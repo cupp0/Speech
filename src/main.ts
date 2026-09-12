@@ -61,8 +61,9 @@ lookupButton.addEventListener("click", async () => {
         const sounds: String[] = word.split(" ");
         for (const sound of sounds){
 
-            // get wav file
-            const wavFile = await fetch("src/phonemes/"+sound+".wav");
+            const address = "public/phonemes/" + sound + ".wav"
+            const soundURL = `${import.meta.env.BASE_URL}${address}`;
+            const wavFile = await fetch(soundURL);
 
             // get audio buffer
             const arrayBuffer = await wavFile.arrayBuffer();
