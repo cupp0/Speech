@@ -1,0 +1,86 @@
+
+export const phonemeTypes = new Map<string, string[]>();
+
+phonemeTypes.set("auxiliary",
+[
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "-",
+    "!",
+    "+",
+    "/",
+    "#",
+    ":",
+    ".",
+    "?"
+]
+)
+
+phonemeTypes.set("VOWEL", 
+[
+   "AA",
+   "AE",
+   "AH",
+   "AO",
+   "AX",
+   "AXR",
+   "AY",
+   "EH",
+   "ER",
+   "EY",
+   "IH",
+   "IX",
+   "IY",
+   "OW",
+   "UH",
+   "UW",
+   "UX",
+   "AW",
+   "OY"
+]
+)
+
+phonemeTypes.set("PLOSIVE", 
+[
+   "B",
+   "CH",
+   "D",
+   "DH",
+   "DX",
+   "G",
+   "JH",
+   "K",
+   "NG", 
+   "NX",
+   "P",
+   "Q",
+   "T",
+   "TH",
+   "V",
+   "W",
+   "WH",
+   "Y"
+]
+)
+
+phonemeTypes.set("LONG", 
+[
+   "EL",
+   "EM",
+   "EN",
+   "F",
+   "H",
+   "L",
+   "M",
+   "N",
+   "R",
+   "S",
+   "SH",
+   "Z",
+   "ZH",
+   "HH"
+]
+)
