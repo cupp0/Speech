@@ -25,7 +25,7 @@ async function playSpeech(){
         for (const p of w.phonemes){
             let b = copyAudioBuffer(phonemeAudio.get(p.label)!);
             b = adjustSamplePitch(b, Math.random()*12 - 6)
-            b = adjustSampleLength(b, Math.random())
+            b = adjustSampleLength(b, Math.random() / 5 + .1)
             buffers.push(b);
         }
     }
