@@ -1,14 +1,10 @@
-import Speech from "../src/Speech"
-import { adjustSamplePitch, playSound, appendBuffers, adjustSampleLength } from "../src/audio"
-import { loadAudioFiles, copyAudioBuffer, phonemeAudio } from "./audio";
-import SpeechPerformance from "./SpeechPerformance";
+import Speech from "./Speech"
+import Word from "./Word";
+import Syllable from "./Syllable"
 import Phoneme from "./Phoneme";
-import { phonemeTypes } from "../src/PhonemeTypes"
-
-
-let currentSpeech: Speech;
-
-loadAudioFiles();
+import SpeechPerfomance from "./SpeechPerformance"
+import { Performer } from "./Performer";
+import { loadAudioFiles } from "./audio";
 
 const wordInput =
     document.getElementById("wordInput") as HTMLInputElement;
@@ -16,40 +12,36 @@ const wordInput =
 const speakButton =
     document.getElementById("speak") as HTMLButtonElement;
 
-speakButton.addEventListener("click", playSpeech);
+speakButton.addEventListener("click", updateSpeech);
 
-async function playSpeech(){
+let currentSpeech: Speech = new Speech(wordInput.value);
+const performer: Performer = new Performer();
+loadAudioFiles();
+
+async function updateSpeech(){
     currentSpeech = new Speech(wordInput.value)
-    const buffers: AudioBuffer[] = [];
-    for (const w of currentSpeech.words){
-        for (const p of w.phonemes){
-            let b = copyAudioBuffer(phonemeAudio.get(p.label)!);
-            b = adjustSamplePitch(b, Math.random()*12 - 6)
-            b = adjustSampleLength(b, Math.random() / 5 + .1)
-            buffers.push(b);
-        }
-    }
-
-    const sequence: AudioBuffer = appendBuffers(buffers);
-    playSound(sequence);
+    performer.sing(currentSpeech, randomPerformance(currentSpeech));
 }
 
-// async function retrieveBuffers(phonemes:Phoneme[]): AudioBuffer[]{
-//     await createSound(p, sp).then(buffer => {
-//         const newBuffer = adjustSamplePitch(buffer, Math.random()*12 - 6)
-//         buffers.push(newBuffer)
-//     }); 
-// }
+function randomPerformance(speech: Speech): SpeechPerfomance{
+    const words = speech.words;
+    const sylls: Syllable[] = [];
+    for (const w of words){
+        for (const s of w.syllables){
+            sylls.push(s);
+        }
+    }
+    const durs: number[] = [];
+    const pitches: number[] = [];
+    const tempo: number = (Math.random() + 2) / 8
 
-// async function generateSpeechBuffer(): AudioBuffer{
-//     const sp = new SpeechPerformance(1, 1, 1)
-//     const phonemes: Phoneme[] = []
+    // give each syllable a duration and pitch
+    for (const s of sylls){
+        //random number 1 to 4;
+        durs.push(2)
+        pitches.push(0)
+    }
 
-//     for (const w of currentSpeech.words){
-//         for (const p of w.phonemes){
-//             phonemes.push(p)
-//         }
-//     }
+    return new SpeechPerfomance(durs, pitches, 1, tempo);
+}
 
-//     const buffers: AudioBuffer[] = retrieveBuffers(phonemes);
-// }

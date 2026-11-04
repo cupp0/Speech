@@ -24,6 +24,14 @@ export async function loadAudioFiles(
     
 }
 
+export function createAudioBuffer(channels: number, length: number, sampleRate: number): AudioBuffer {
+    return audioContext.createBuffer(
+        channels,
+        length,
+        sampleRate
+    );
+}
+
 export function copyAudioBuffer(source: AudioBuffer): AudioBuffer {
     const copy = audioContext.createBuffer(
         source.numberOfChannels,
@@ -46,6 +54,60 @@ export function playSound(buffer: AudioBuffer){
     source.buffer = buffer;
     source.connect(audioContext.destination);
     source.start();
+}
+
+export function getLoudestSampleIndex(buffer: AudioBuffer):number{
+    const pcmData = buffer.getChannelData(0);
+    let index = 0;
+    for (let i = 0; i < buffer.length; i++){
+        if (Math.abs(pcmData[i]) > Math.abs(pcmData[index])) index = i;
+    }
+    console.log(index, buffer.length)
+    return index;
+}
+
+//locates loudest point in a sample and gives length to the end
+export function getFadeFromMax(buffer: AudioBuffer): number{
+    return buffer.length - getLoudestSampleIndex(buffer);
+}
+
+// where - "BEGINNING" means remove from the beginning of the buffer
+export function trim(buffer: AudioBuffer, where: string, index: number): AudioBuffer{
+    
+    const length = where === "BEGINNING" ? buffer.length - index: index;
+    const startIndex = where === "BEGINNING" ? index : 0;
+
+    const newBuffer = audioContext.createBuffer(
+        buffer.numberOfChannels,
+        length,
+        buffer.sampleRate
+    );
+
+    const pcmData = buffer.getChannelData(0);
+    const newData = newBuffer.getChannelData(0);
+
+    for (let i = 0; i < length; i++){
+        if (startIndex+i >= buffer.length) continue;
+        newData[i] = pcmData[startIndex+i];
+    }
+
+    return newBuffer
+}
+
+export function fadeIn(buffer: AudioBuffer, duration: number){
+    const pcmData = buffer.getChannelData(0);
+    for (let i = 0; i < duration; i++){
+        const mult = i / duration;
+        pcmData[i] *= mult;
+    }
+}
+
+export function fadeOut(buffer: AudioBuffer, duration: number){
+    const pcmData = buffer.getChannelData(0);
+    for (let i = pcmData.length - 1; i > pcmData.length - duration; i--){
+        const mult = Math.abs((i - pcmData.length - 1)  / duration);
+        pcmData[i] *= mult;
+    }
 }
 
 export function appendBuffers(buffers: AudioBuffer[]): AudioBuffer{
@@ -86,7 +148,6 @@ export function adjustSamplePitch(buffer: AudioBuffer, semitones: number): Audio
     );
     const pcmData = buffer.getChannelData(0);
     const newData = newBuffer.getChannelData(0);
-
 
     for (let index = 0; index < newBuffer.length; index++){
         const targetIndex = index*mult;
